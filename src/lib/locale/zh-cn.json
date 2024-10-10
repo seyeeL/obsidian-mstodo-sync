@@ -50,5 +50,7 @@
 	"Settings_Todo_Display_AddCreatedAtOnReplaceDescription": "在选择“创建待办并替换”时添加当前时间，格式为上面填写的时间格式",
 	"EditorMenu_OpenToDo": "在微软Todo中打开",
 	"Settings_Todo_OpenUsingApplicationProtocolTitle": "使用微软Todo桌面应用打开待办",
+	"Settings_Todo_SaveNoteNameToBody": "将笔记名称保存到待办内容中",
+	"Settings_Todo_SaveNoteNameToBodyDescription": "选中则将笔记名称保存到待办内容中，未选中则不保存",
 	"Settings_Todo_OpenUsingApplicationProtocolDescription": "选中则使用微软Todo桌面应用打开待办，未选中则在浏览器中打开"
 }

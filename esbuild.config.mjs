@@ -38,5 +38,5 @@ esbuild.build({
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
-	outfile: 'main.js',
+	outfile: 'D:\\MyObsidian\\.obsidian\\plugins\\obsidian-mstodo-sync\\main.js',
 }).catch(() => process.exit(1));

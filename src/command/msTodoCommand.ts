@@ -151,7 +151,7 @@ export async function postSingleTask(
 	}
 	new Notice('创建单个待办中...', 3000);
 
-	const body = `${t('displayOptions_CreatedInFile')} [[${fileName}]]`;
+	const body = plugin.settings.saveNoteNameToBody ? `${t('displayOptions_CreatedInFile')} [[${fileName}]]` : '';
 	const selectedText = editor.getSelection().trim();
 
 	const newTask = await todoApi.createTask(listId, selectedText, body);

@@ -33,6 +33,9 @@ export interface MsTodoSyncSettings {
 	// Private configuration updated by the plugin and not user.
 	taskIdLookup: { [key: string]: string };
 	taskIdIndex: number;
+
+	// New setting
+	saveNoteNameToBody: boolean;
 }
 
 export const DEFAULT_SETTINGS: MsTodoSyncSettings = {
@@ -62,6 +65,7 @@ export const DEFAULT_SETTINGS: MsTodoSyncSettings = {
 	},
 	taskIdLookup: { ['0000ABCD']: '0' },
 	taskIdIndex: 0,
+	saveNoteNameToBody: true,
 };
 
 export class MsTodoSyncSettingTab extends PluginSettingTab {
@@ -90,12 +94,9 @@ export class MsTodoSyncSettingTab extends PluginSettingTab {
 			.setName(t('Settings_Todo_DefaultListName'))
 			.setDesc(t('Settings_Todo_DefaultListNameDescription'))
 			.addText((text) =>
-				text
-					// .setPlaceholder('输入Todo列表名称')
-					.setValue(this.settings.todoListSync.listName ?? '')
-					.onChange(async (value) => {
-						this.settings.todoListSync.listName = value;
-					}),
+				text.setValue(this.settings.todoListSync.listName ?? '').onChange(async (value) => {
+					this.settings.todoListSync.listName = value;
+				}),
 			);
 
 		new Setting(containerEl)
@@ -108,37 +109,12 @@ export class MsTodoSyncSettingTab extends PluginSettingTab {
 				}),
 			);
 
-		// Formatting Options that user can set
-		containerEl.createEl('h2', {
-			text: t('Settings_Todo_Display_Heading'),
-		});
-
 		new Setting(containerEl)
-			.setName(t('Settings_Todo_Display_DateFormat'))
-			.setDesc(t('Settings_Todo_Display_DateFormatDescription'))
-			.addText((text) =>
-				text.setValue(this.settings.displayOptions_DateFormat ?? '').onChange(async (value) => {
-					this.settings.displayOptions_DateFormat = value;
-					await this.plugin.saveSettings();
-				}),
-			);
-
-		new Setting(containerEl)
-			.setName(t('Settings_Todo_Display_TimeFormat'))
-			.setDesc(t('Settings_Todo_Display_TimeFormatDescription'))
-			.addText((text) =>
-				text.setValue(this.settings.displayOptions_TimeFormat ?? '').onChange(async (value) => {
-					this.settings.displayOptions_TimeFormat = value;
-					await this.plugin.saveSettings();
-				}),
-			);
-
-		new Setting(containerEl)
-			.setName(t('Settings_Todo_Display_AddCreatedAtOnReplace'))
-			.setDesc(t('Settings_Todo_Display_AddCreatedAtOnReplaceDescription'))
+			.setName(t('Settings_Todo_SaveNoteNameToBody'))
+			.setDesc(t('Settings_Todo_SaveNoteNameToBodyDescription'))
 			.addToggle((toggle) =>
-				toggle.setValue(this.settings.displayOptions_ReplaceAddCreatedAt).onChange(async (value) => {
-					this.settings.displayOptions_ReplaceAddCreatedAt = value;
+				toggle.setValue(this.settings.saveNoteNameToBody).onChange(async (value) => {
+					this.settings.saveNoteNameToBody = value;
 					await this.plugin.saveSettings();
 				}),
 			);
