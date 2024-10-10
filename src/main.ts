@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Plugin } from 'obsidian';
 import { TodoApi } from './api/todoApi';
 import { DEFAULT_SETTINGS, MsTodoSyncSettingTab, MsTodoSyncSettings } from './gui/msTodoSyncSettingTab';
-import { createTodayTasks, getTaskIdFromLine, postTask } from './command/msTodoCommand';
+import { createTodayTasks, getTaskIdFromLine, postTask, postSingleTask } from './command/msTodoCommand';
 import { t } from './lib/lang';
 import { log, logging } from './lib/logging';
 
@@ -48,6 +48,40 @@ export default class MsTodoSync extends Plugin {
 								this.app.workspace.getActiveFile()?.basename,
 								this,
 								true,
+							),
+					);
+				});
+			}),
+		);
+
+		// 在 main.ts 的 onload 方法中添加以下代码
+
+		// 注册命令：将选中的文字作为单个任务创建微软待办
+		this.addCommand({
+			id: 'create-single-task',
+			name: '同步到微软待办（单个任务）',
+			editorCallback: async (editor: Editor, view: MarkdownView) =>
+				await postSingleTask(
+					this.todoApi,
+					this.settings.todoListSync?.listId,
+					editor,
+					this.app.workspace.getActiveFile()?.basename,
+					this,
+				),
+		});
+
+		// 在右键菜单中注册命令：将选中的文字作为单个任务创建微软待办
+		this.registerEvent(
+			this.app.workspace.on('editor-menu', (menu, editor, view) => {
+				menu.addItem((item) => {
+					item.setTitle('同步到微软待办（单个任务）').onClick(
+						async () =>
+							await postSingleTask(
+								this.todoApi,
+								this.settings.todoListSync?.listId,
+								editor,
+								this.app.workspace.getActiveFile()?.basename,
+								this,
 							),
 					);
 				});

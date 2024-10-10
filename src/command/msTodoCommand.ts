@@ -35,12 +35,14 @@ export async function postTask(
 		return;
 	}
 	new Notice('创建待办中...', 3000);
+	// 创建待办事项的文件名
 	const body = `${t('displayOptions_CreatedInFile')} [[${fileName}]]`;
+	// 获取选中的文本并格式化
 	const formatted = editor
 		.getSelection()
-		.replace(/(- \[ \] )|\*|^> |^#* |- /gm, '')
-		.split('\n')
-		.filter((s) => s != '');
+		.replace(/(- \[ \] )|\*|^> |^#* |- /gm, '') // 移除特定的字符和格式
+		.split('\n') // 按行分割
+		.filter((s) => s != ''); // 过滤掉空行
 	log('debug', formatted.join(' :: '));
 	Promise.all(
 		formatted.map(async (s) => {
@@ -128,4 +130,48 @@ ${lines?.join('\n')}
 	new Notice('待办列表已获取');
 	if (editor) editor.replaceSelection(segments);
 	else return segments;
+}
+
+// 在 msTodoCommand.ts 中添加这个新函数
+export async function postSingleTask(
+	todoApi: TodoApi,
+	listId: string | undefined,
+	editor: Editor,
+	fileName: string | undefined,
+	plugin: MsTodoSync,
+	replace?: boolean,
+) {
+	if (!editor.somethingSelected()) {
+		new Notice('好像没有选中什么');
+		return;
+	}
+	if (!listId) {
+		new Notice('请先设置同步列表');
+		return;
+	}
+	new Notice('创建单个待办中...', 3000);
+
+	const body = `${t('displayOptions_CreatedInFile')} [[${fileName}]]`;
+	const selectedText = editor.getSelection().trim();
+
+	const newTask = await todoApi.createTask(listId, selectedText, body);
+	plugin.settings.taskIdIndex = plugin.settings.taskIdIndex + 1;
+	const index = `${Math.random().toString(20).substring(2, 6)}${plugin.settings.taskIdIndex
+		.toString()
+		.padStart(5, '0')}`;
+	plugin.settings.taskIdLookup[index] = newTask.id === undefined ? '' : newTask.id;
+	await plugin.saveSettings();
+
+	new Notice('创建单个待办成功√');
+	if (replace) {
+		let createdAt = '';
+		const blocklink = `^${index}`;
+		const formattedTask = formatTask(plugin, selectedText);
+		if (plugin.settings.displayOptions_ReplaceAddCreatedAt) {
+			createdAt = `${t('displayOptions_CreatedAtTime')} ${window
+				.moment()
+				.format(plugin.settings.displayOptions_TimeFormat)}`;
+		}
+		editor.replaceSelection(`${formattedTask} ${createdAt} ${blocklink}`);
+	}
 }
